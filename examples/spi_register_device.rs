@@ -309,13 +309,10 @@ where
     if id.manufacturer()? == Manufacturer::CarmineCrystal && id.version() == 6 && id.edition() == 5
     {
         // Yes, set pin 0 to output
-        device
-            .registers()
-            .mode()
-            .modify_index(2, |r, w| {
-                println!("{:?}", r);
-                w.mode(PinMode::Output)
-            })?;
+        device.registers().mode().modify_index(2, |r, w| {
+            println!("{:?}", r);
+            w.mode(PinMode::Output)
+        })?;
         // Enable output on pin 0
         device
             .registers()

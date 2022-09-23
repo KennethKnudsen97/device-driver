@@ -80,6 +80,7 @@ pub trait RegisterInterface {
 #[macro_export]
 macro_rules! implement_registers {
     (
+        consts: [$(const $const_name:ident : $const_ty:ty),*],
         $(#[$register_set_doc:meta])*
         $device_name:ident.$register_set_name:ident<$register_address_type:ty> = {
             $(
@@ -106,7 +107,7 @@ macro_rules! implement_registers {
             use device_driver::_store_with_endianness;
             use device_driver::generate_if_debug_keyword;
 
-            impl<'a, I: HardwareInterface> $device_name<I>
+            impl<'a, I: HardwareInterface<$($const_name),*>, $(const $const_name : $const_ty),*> $device_name<I, $($const_name),*>
             where
                 I: 'a + RegisterInterface<Address = $register_address_type>,
             {

@@ -45,6 +45,7 @@ macro_rules! create_low_level_device {
         $(#[$device_doc:meta])*
         $device_name:ident {
             errors: [$($error_type:ident),*],
+            consts: [$(const $const_name:ident : $const_ty:ty),*],
             hardware_interface_requirements: {$($hardware_interface_bound_type:tt)*},
             hardware_interface_capabilities: $hardware_interface_capabilities:tt $(,)?
         }
@@ -53,21 +54,21 @@ macro_rules! create_low_level_device {
         use device_driver::ll::register::ConversionError;
 
         /// Marker trait for hardware interface implementations
-        pub trait HardwareInterface : $($hardware_interface_bound_type)* $hardware_interface_capabilities
+        pub trait HardwareInterface <$(const $const_name : $const_ty),*>: $($hardware_interface_bound_type)* $hardware_interface_capabilities
 
         $(#[$device_doc])*
-        pub struct $device_name<I: HardwareInterface> {
+        pub struct $device_name<I: HardwareInterface<$($const_name),*>, $(const $const_name : $const_ty),*> {
             interface: I,
         }
 
-        impl<I: HardwareInterface> $device_name<I> {
+        impl<I: HardwareInterface<$($const_name),*>, $(const $const_name : $const_ty),*> $device_name<I,$($const_name),*> {
             /// Access to the pure hardware interface type
             pub fn interface(&mut self) -> &mut I {
                 &mut self.interface
             }
         }
 
-        impl<I: HardwareInterface> LowLevelDevice<I> for $device_name<I> {
+        impl<I: HardwareInterface<$($const_name),*>, $(const $const_name : $const_ty),*> LowLevelDevice<I> for $device_name<I, $($const_name),*> {
             fn new(interface: I) -> Self
             where
                 Self: Sized,
